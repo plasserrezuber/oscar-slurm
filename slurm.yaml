@@ -8,7 +8,7 @@ parameters:
     description: Cluster base name (lowercase)
     constraints:
       - allowed_pattern: "[a-z0-9]*"
-    default: tap
+    default: debat
 
   node_count:
     description: Number of slurm nodes
@@ -53,7 +53,7 @@ parameters:
   
   master_data_volume_size:
     type: number
-    default: 400
+    default: 1024
     label: Master data volume size GB
   
   master_data_volume_type:
@@ -181,10 +181,10 @@ resources:
           params:
             $name: { get_param: base_name }
       network_id: { get_resource: triannot_net }
-      cidr: 10.45.5.0/24
-      gateway_ip: 10.45.5.1
+      cidr: 10.45.8.0/24
+      gateway_ip: 10.45.8.1
       allocation_pools:
-        - {end: 10.45.5.54,start: 10.45.5.2}
+        - {end: 10.45.8.54,start: 10.45.8.2}
       enable_dhcp: true
 
   triannot_router:
@@ -400,10 +400,11 @@ resources:
 
             echo "__test__" >> $LOGS
             echo "ansible git" >> $LOGS
-            git clone https://github.com/meso-uca/triannot.git #https://github.com/balbes15/ansible-triannot.git
+            #git clone https://github.com/meso-uca/triannot.git #https://github.com/balbes15/ansible-triannot.git
+            git clone -b oscar-slurm https://github.com/HeleneRimbert/oscar-triannot.git
             echo "ansible git done" >> $LOGS
 
-            cd triannot/ansible
+            cd oscar-triannot/ansible
             chown -R centos:centos $DEFAULT_LOGIN_HOME/triannot
             pwd >> $LOGS
             rm ./group_vars/all/slurm.yml
