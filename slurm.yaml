@@ -36,7 +36,7 @@ parameters:
      Choose an instance flavor for node
    constraints:
      - custom_constraint: nova.flavor
-  
+
   image_id:
     type: string
     label: Server image
@@ -50,14 +50,15 @@ parameters:
     type: string
     default: centos
     label: Image default login
-  
+
   master_data_volume_size:
     type: number
     default: 1024
     label: Master data volume size GB
-  
+
   master_data_volume_type:
     type: string
+    default: "ceph-ssd"
     constraints:
       - allowed_values: ["ceph-ssd", "standard"]
 
@@ -68,7 +69,7 @@ parameters:
     default: ""
     constraints:
       - allowed_pattern: "[a-z]*"
-  
+
   user1_key:
     type: string
     label: user1 ssh key
@@ -82,7 +83,7 @@ parameters:
     default: ""
     constraints:
       - allowed_pattern: "[a-z]*"
-  
+
   user2_key:
     type: string
     label: user2 ssh key
@@ -96,7 +97,7 @@ parameters:
     default: ""
     constraints:
       - allowed_pattern: "[a-z]*"
-  
+
   user3_key:
     type: string
     label: user3 ssh key
@@ -110,13 +111,13 @@ parameters:
     default: ""
     constraints:
       - allowed_pattern: "[a-z]*"
-  
+
   user4_key:
     type: string
     label: user4 ssh key
     description: User4 ssh public key
     default: ""
-  
+
   user5_name:
     type: string
     label: user5 name
@@ -124,13 +125,13 @@ parameters:
     default: ""
     constraints:
       - allowed_pattern: "[a-z]*"
-  
+
   user5_key:
     type: string
     label: user5 ssh key
     description: User5 ssh public key
     default: ""
-    
+
 
 resources:
 
@@ -140,7 +141,7 @@ resources:
       handle: { get_resource: wait_handle }
       count: { get_param: node_count }
       timeout: 300
-  
+
   wait_handle:
     type: OS::Heat::WaitConditionHandle
 
@@ -198,7 +199,7 @@ resources:
             $name: { get_param: base_name }
       external_gateway_info:
         network: provider-public-uca1
-        
+
   triannot_router_interface:
     type: OS::Neutron::RouterInterface
     properties:
@@ -242,7 +243,7 @@ resources:
           remote_ip_prefix: 0.0.0.0/0
           port_range_min: 1
           port_range_max: 65535
-  
+
   triannot_master_port:
     type: OS::Neutron::Port
     properties:
@@ -250,7 +251,7 @@ resources:
       security_groups:
         - default
         - { get_resource: triannot_master_security_group }
-  
+
   triannot_node_port:
     type: OS::Heat::ResourceGroup
     properties:
@@ -270,7 +271,7 @@ resources:
                     $name: triannot_node
                     $index: "%index%"
                     $port: _port
-  
+
   triannot_cluster:
     type: OS::Heat::ResourceGroup
     depends_on: triannot_node_port
@@ -303,7 +304,7 @@ resources:
               template: |
                 #!/bin/bash
                 setenforce permissive #disable selinux
-                
+
                 DEFAULT_LOGIN_HOME=/home/"__default_login__"
                 echo "__public_key__" >> /home/"__default_login__"/.ssh/authorized_keys
                 echo "__private_key__" >> /home/"__default_login__"/.ssh/id_rsa
@@ -317,7 +318,7 @@ resources:
                 printf "node_sockets: %s\n" $node_sockets >> $DEFAULT_LOGIN_HOME/var.yml
 
                 TIMEOUT=30    # number of iterations (5 minutes?)
-                while :; do 
+                while :; do
                   status=$(sudo -u "__default_login__" ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=no 127.0.0.1 -p 22 echo ok 2>&1)
                   RESULT=$?
                   if [ $RESULT -eq 0 ]; then
@@ -334,7 +335,7 @@ resources:
                   fi
                   TIMEOUT=$((TIMEOUT-1))
                   if [ $TIMEOUT -eq 0 ]; then
-                      exit 1 
+                      exit 1
                   fi
                   sleep 10s
                 done
@@ -346,7 +347,7 @@ resources:
               params:
                 $name: { get_param: base_name }
                 $index: "compute%index%"
-    
+
   triannot_master:
     type: OS::Nova::Server
     depends_on: triannot_cluster
@@ -381,7 +382,7 @@ resources:
             #!/bin/bash
 
             setenforce permissive #disable selinux
-            
+
             DEFAULT_LOGIN_HOME=/home/"__default_login__"
             touch $DEFAULT_LOGIN_HOME/logs.txt
             LOGS=$DEFAULT_LOGIN_HOME/logs.txt
@@ -445,7 +446,7 @@ resources:
 
             export ANSIBLE_HOST_KEY_CHECKING=False
             sudo -u "__default_login__" ansible-playbook -i hosts.ini deploy.yml >> $LOGS
-      name: 
+      name:
         str_replace:
           template:
             $name-master
@@ -463,14 +464,14 @@ resources:
     type: OS::Neutron::FloatingIP
     properties:
       floating_network: provider-public-uca1
-  
+
   floating_ip_assoc:
     type: OS::Neutron::FloatingIPAssociation
     depends_on: triannot_master
     properties:
       floatingip_id: { get_resource: floating_ip }
       port_id: { get_resource: triannot_master_port }
-  
+
 outputs:
     public_ip:
       description: The public IP address of this slurm cluster.
