@@ -124,6 +124,7 @@
         - 'libXaw-devel'
         - 'gsl'
         - 'armadillo'
+        - 'rclone'
 
 - name: Adapt file /etc/modulefiles/core/crri.lua
   lineinfile:
