@@ -406,7 +406,7 @@ resources:
             echo "ansible git done" >> $LOGS
 
             cd oscar-triannot/ansible
-            chown -R centos:centos $DEFAULT_LOGIN_HOME/triannot
+            chown -R centos:centos $DEFAULT_LOGIN_HOME/oscar-triannot
             pwd >> $LOGS
             rm ./group_vars/all/slurm.yml
             ls ./group_vars/all/ >> $LOGS
