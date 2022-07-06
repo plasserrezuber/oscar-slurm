@@ -1,7 +1,7 @@
 
-# rclone mount : acces in read-only mode to my data on oscar
+# rclone mount
 
-mounting my s3 repo :
+acces in read-only mode to my data on oscar:
 
 ```console
 nohup rclone mount --dir-cache-time=2m \
