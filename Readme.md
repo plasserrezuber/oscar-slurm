@@ -20,6 +20,6 @@ $ nohup rclone mount --dir-cache-time=2m \
 $ wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
 $ bash Miniconda3-py39_4.12.0-Linux-x86_64.sh
 $ conda -V
-$ conda add -c bioconda
-$ conda add -c conda-forge
+$ conda config --add channels bioconda
+$ conda config --add channels conda-forge
 ```
