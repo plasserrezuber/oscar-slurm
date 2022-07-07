@@ -22,4 +22,5 @@ $ bash Miniconda3-py39_4.12.0-Linux-x86_64.sh
 $ conda -V
 $ conda config --add channels bioconda
 $ conda config --add channels conda-forge
+$ conda env create --file myenv.yml
 ```
