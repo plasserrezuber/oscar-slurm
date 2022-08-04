@@ -125,6 +125,7 @@
         - 'gsl'
         - 'armadillo'
         - 'rclone'
+        - 'parallel'
 
 - name: Adapt file /etc/modulefiles/core/crri.lua
   lineinfile:
