@@ -24,3 +24,14 @@ $ conda config --add channels bioconda
 $ conda config --add channels conda-forge
 $ conda env create --file myenv.yml
 ```
+
+# check SLURM controler
+
+Sometimes, the SLURM controler is hanging. Restart is needed
+
+```console
+# service slurmctld status # check if SLURM controller is dead
+# service slurmctld restart # restart the controller
+# service slurmctld status # check the restart is OK
+# sinfo # check if SLURM detects the nodes
+```
