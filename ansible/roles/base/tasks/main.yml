@@ -126,6 +126,7 @@
         - 'armadillo'
         - 'rclone'
         - 'parallel'
+        - 'git'
 
 - name: Adapt file /etc/modulefiles/core/crri.lua
   lineinfile:
